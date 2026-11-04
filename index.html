@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Benchmark Pilier 3</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -714,7 +715,7 @@ const AX=[['Solvabilité',[['cet1_ratio','Ratio CET1'],['m_cet1','Marge CET1 au-
  ['Liquidité',[['lcr','LCR'],['nsfr','NSFR']]],
  ['Structure des risques',[['dens_lev','Densité des RWA (RWA / levier)'],['irb_share','Part des RWA de crédit en IRB'],['fl_gap','Marge sur l’output floor (facteur de l’année)']]],
  ['Qualité du crédit',[['cr1_npl_010','Taux de créances non performantes'],['cr1_cov_010','Taux de couverture des NPE'],['cr1_s2_010','Part des encours en étape 2']]],
- ['Modèles internes',[['cr6_rw_res','Pondération IRB – immobilier résidentiel'],['cr6_rw_corp','Pondération IRB – entreprises']]]];
+ ['Modèles internes',[['c2_mr_0190','Immobilier : modèles ÷ standard'],['c2_mr_0110','Entreprises A-IRB : modèles ÷ standard']]]];
 function at(key,b,p){for(let q=p;q>=Math.max(0,p-1);q--){const v=val(key,b,q);if(v!=null)return{v,q}}return null}
 function ficheRows(bid,p){
   const peers=[...new Set([...sel().map(b=>b.id),bid])].map(id=>B[id]);
@@ -763,7 +764,7 @@ function viewFiche(){
   fr.forEach(([,rows])=>rows.forEach(r=>{r.vs.forEach(x=>dmc.m(r.k,x.b.id,r.q));dmc.add(medLine(r.k,r.q,pe))}));
   const fh=['Axe','Indicateur','Période',...pe.map(x=>x.short),'Médiane','Rang de '+b.short],frows=fr.flatMap(([g,rows])=>rows.map(r=>[g,r.l,qlab(r.q),...pe.map(x=>{const v=val(r.k,x.id,r.q);return v==null?'n.d.':fv(r.k,v)+(flag(r.k,x.id,r.q)?' †':'')}),r.med==null?'n.d.':fv(r.k,r.med),r.rank?`${r.rank}/${r.n}`:'n.d.']));
   return`<div class="ctl">${opts}${pc}</div><section class="card" style="border-left:4px solid ${bcol(bid)}"><div class="hd"><h2>Ce qu’il faut retenir : ${esc(b.short)}</h2><span>${qlab(p)} · comparaison avec ${peers-1} autre(s) banque(s)</span></div><ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">${L.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p class="note" style="margin-top:10px">Synthèse générée automatiquement à partir des données, sans jugement de valeur : « le plus élevé » n’est pas forcément « le meilleur ».</p></section>
-  <section class="card"><div class="hd"><h2>Positionnement dans le panel</h2><span>point coloré : ${esc(b.short)} · points gris : autres banques · trait : médiane</span></div><div class="chart" id="c1"></div><p class="note" style="margin-top:10px">Chaque ligne a sa propre échelle, du minimum au maximum du panel. À droite : valeur, rang (1 = valeur la plus élevée) et variation depuis la période précédente. Les indicateurs semestriels (qualité du crédit, modèles internes) sont pris au dernier dépôt disponible.</p></section>${dmCard({table:{head:fh,rows:frows},lines:dmc.a})}`
+  <section class="card"><div class="hd"><h2>Positionnement dans le panel</h2><span>point coloré : ${esc(b.short)} · points gris : autres banques · trait : médiane</span></div><div class="chart" id="c1"></div><p class="note" style="margin-top:10px">Chaque ligne a sa propre échelle, du minimum au maximum du panel. À droite : valeur, rang (1 = valeur la plus élevée) et variation depuis la période précédente. Les indicateurs semestriels (qualité du crédit) sont pris au dernier dépôt disponible. Modèles internes (CMS2, trimestriel) : RWA calculés par les modèles ÷ RWA des mêmes expositions en approche standard ; 40 % signifie que les modèles réduisent de 60 % les RWA de ce portefeuille, plus de 100 % qu’ils sont plus pénalisants que le standard. Ici, une valeur basse (rang élevé) traduit le gain le plus fort ; † : comparabilité limitée.</p></section>${dmCard({table:{head:fh,rows:frows},lines:dmc.a})}`
 }
 
 /* ---------- banque de référence ---------- */
