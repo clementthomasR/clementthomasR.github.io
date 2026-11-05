@@ -336,7 +336,7 @@ function viewNotes(){
   <h2>Définitions</h2><ul><li><b>Taux de créances non performantes</b> : créances non performantes divisées par l’encours brut (sains + non performants), modèle CR1.</li><li><b>Taux de couverture</b> : dépréciations cumulées sur les créances non performantes, divisées par ces créances.</li><li><b>Part en étape 2</b> : encours en étape 2 (hausse significative du risque) divisés par l’encours brut.</li><li><b>Seuil MDA</b> : niveau de CET1 sous lequel les distributions (dividendes, rachats, coupons AT1, bonus) sont restreintes : 4,5 % + part CET1 de la P2R + coussins combinés.</li><li><b>Marge sur exigence</b> : ratio publié moins l’exigence correspondante (KM1), en points et en montant (marge × RWA, ou × exposition de levier).</li><li><b>Effet fonds propres / effet RWA</b> : décomposition exacte de la variation du ratio CET1 recalculé (CET1 / RWA).</li><li><b>Pondération moyenne IRB</b> : RWA divisés par l’exposition (EAD), encours sains, CR6.</li><li><b>Médiane</b> : calculée sur les banques cochées en haut de page.</li></ul>
   <h2>Corrections appliquées aux données déposées</h2><p>Quelques dépôts contiennent des anomalies que l’outil corrige ou signale par le signe †.</p><ul>${D.notes.map(n=>`<li>${esc(n)}</li>`).join('')}${rec.length?`<li>${rec.length} valeur(s) absente(s) du dépôt du trimestre ont été reprises de la colonne « T-1 » du dépôt suivant de la même banque (cas de BBVA au T2 2025 et au T3 2025, BNP Paribas au T3 2025 pour OV1).</li>`:''}<li>Les ratios hors plage plausible (par exemple un ratio de levier déposé comme un montant) sont écartés et remplacés par la reprise ci-dessus quand elle existe.</li></ul>
   <h2>Vérifier un chiffre</h2><p>Chaque onglet d’analyse se termine par l’encart « Données et méthode » : formule de chaque indicateur, recalcul pas à pas de chaque valeur, cellules sources (paquet déposé sur le Pillar 3 Data Hub, modèle, tableau, ligne, colonne, valeur déposée) et ajustements éventuels. Le bouton « Exporter vers Excel » en fait un classeur dont les formules recalculent les valeurs du tableau de bord à partir des cellules déposées. L’onglet « Qualité des données » regroupe toutes les valeurs reposant sur une donnée corrigée.</p>
-  <h2>Mise à jour</h2><p>Les dépôts sont publiés chaque trimestre. Pour intégrer un nouveau trimestre, il faut récupérer les nouveaux fichiers sur EDAP et republier cette page. Dernière extraction : 04/11/2026.</p></div>`
+  <h2>Mise à jour</h2><p>Les dépôts sont publiés chaque trimestre. Pour intégrer un nouveau trimestre, il faut récupérer les nouveaux fichiers sur EDAP et republier cette page. Dernière extraction : 05/11/2026.</p></div>`
 }
 
 
@@ -2183,7 +2183,7 @@ addEventListener('resize',rd);matchMedia('(prefers-color-scheme:dark)').addEvent
 new MutationObserver(()=>render()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 
 /* ---------- démarrage ---------- */
-$('#asof').innerHTML=`Dépôts de ${qlab(0)} à ${qlab(P.length-1)}<br>${B.length} groupes · ${Object.keys(TPLN).length} modèles Pilier 3`;
+$('#asof').innerHTML=`Dépôts de ${qlab(0)} à ${qlab(P.length-1)}<br>${B.length} groupes<br><span style="font-style:italic">Certaines informations sont encore en cours de fiabilisation</span>`;
 {const h=location.hash.slice(1);if(TABS.some(t=>t[0]===h))S.tab=h}
 addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(TABS.some(x=>x[0]===t)&&t!==S.tab){S.tab=t;S.per=null;render()}});
 render();
