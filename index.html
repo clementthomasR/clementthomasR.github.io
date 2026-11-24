@@ -161,8 +161,8 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme:dark)').matches};
 const bcol=id=>S.ref!=null&&id!==S.ref?'var(--oth)':`var(--s${id+1})`;
-const TABS=[['fiche','Fiche banque'],['alertes','Points d’attention'],['croisements','Nuages de points'],['trajectoire','Trajectoire du CET1'],['credit','Crédit – autres'],['qualite','Qualité des données'],['capital','Capital et liquidité'],['marges','Marges sur exigences'],['fonds','Composition des fonds propres'],['liq','Liquidité (LCR)'],['mrel','MREL et TLAC (KM2)'],['irrbb','Risque de taux (IRRBB1)'],['titri','Titrisation (SEC)'],['sec1','SEC1'],['levier','Ratio de levier (LR2)'],['marche','Risque de marché (MR1, MR2)'],['sa','Approche standard (CR4, CR5)'],['flux','Variation des RWA (CR8, CCR7, MR2B)'],['variation','Variation du CET1'],['rwa','Structure des RWA'],['of','Synthèse'],['ofc','Par classe de risque'],['ofx','Par classe d’exposition'],['ofq','Comparer deux trimestres'],['modeles','Modèles internes'],['secteurs','Secteurs d’activité'],['pays','Pays'],['lexique','Lexique'],['notes','Sources et méthode'],['legal','Mentions légales']];
-const SECTIONS=[['synthese','Synthèse',['fiche','alertes']],['solva','Solvabilité',['capital','marges','fonds','levier','variation','trajectoire']],['liquidite','Liquidité et résolution',['liq','mrel','irrbb']],['of','Output floor',['of','ofc','ofx','ofq']],['risques','Risques',['rwa','modeles','marche','flux']],['titrisation','Titrisation',['titri','sec1']],['credit','Crédit',['croisements','credit','sa','secteurs','pays']],['ref','Référence',['lexique','qualite','notes','legal']]];
+const TABS=[['fiche','Fiche banque'],['alertes','Points d’attention'],['croisements','Nuages de points'],['trajectoire','Trajectoire du CET1'],['credit','Crédit – autres'],['qualite','Qualité des données'],['capital','Capital et liquidité'],['marges','Marges sur exigences'],['fonds','Composition des fonds propres'],['liq','Liquidité (LCR)'],['nsfr','Financement stable (NSFR)'],['mrel','MREL et TLAC (KM2)'],['irrbb','Risque de taux (IRRBB1)'],['titri','Titrisation (SEC)'],['sec1','SEC1'],['levier','Ratio de levier (LR2)'],['marche','Risque de marché (MR1, MR2)'],['sa','Approche standard (CR4, CR5)'],['flux','Variation des RWA (CR8, CCR7, MR2B)'],['variation','Variation du CET1'],['rwa','Structure des RWA'],['of','Synthèse'],['ofc','Par classe de risque'],['ofx','Par classe d’exposition'],['ofq','Comparer deux trimestres'],['modeles','Modèles internes'],['secteurs','Secteurs d’activité'],['pays','Pays'],['lexique','Lexique'],['notes','Sources et méthode'],['legal','Mentions légales']];
+const SECTIONS=[['synthese','Synthèse',['fiche','alertes']],['solva','Solvabilité',['capital','marges','fonds','levier','variation','trajectoire']],['liquidite','Liquidité et résolution',['liq','nsfr','mrel','irrbb']],['of','Output floor',['of','ofc','ofx','ofq']],['risques','Risques',['rwa','modeles','marche','flux']],['titrisation','Titrisation',['titri','sec1']],['credit','Crédit',['croisements','credit','sa','secteurs','pays']],['ref','Référence',['lexique','qualite','notes','legal']]];
 const TL=Object.fromEntries(TABS);const secOf=t=>SECTIONS.find(x=>x[2].includes(t))||SECTIONS[0];
 const S={tab:'fiche',ref:null,last:{},xp:'credit',path:false,t0:null,t1:null,lex:'fiche',bank:0,mkey:'m_cet1',ckey:'cc1_ded',lkey:'liq_lcr',c6:'rw',pf:'tot',v0:null,v1:null,sel:new Set(B.map(b=>b.id)),key:'cet1_ratio',fkey:'fl_gap_full',cmeas:'ratio',cbase:'e',qa:null,qb:null,cmpm:'ratio',cmpb:'d',cmpc:'0080',ctype:'npl',sector:'010',per:null,mtr:'npl',redraw:null};
 const nf=(v,d)=>v.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1221,6 +1221,13 @@ const LEX=[
  ['Pondération moyenne des positions conservées','RWA des positions conservées ÷ leur exposition.','SEC3 ligne 1 : (j + k + l + m) ÷ (f + g + h + i).'],
  ['Approches réglementaires','Part des positions conservées en SEC-IRBA, SEC-ERBA, SEC-SA ou pondérées à 1 250 %.','SEC3 ligne 1 : f, g, h ou i ÷ (f + g + h + i).'],
  ['Encours titrisés en défaut','Part des encours titrisés par la banque qui sont en défaut.','SEC5 ligne 1 : b ÷ a ; ajustements pour risque de crédit : |c| ÷ a.']]],
+['nsfr','Financement stable (NSFR)','Ratio de financement stable net (NSFR), d’après KM1 (lignes 18 à 20), valeurs de fin de trimestre : marge de sécurité, évolution dans le temps, décomposition de la variation, excédent en montant et comparaison avec le LCR.',[
+ ['NSFR','Financement stable disponible rapporté au financement stable requis, sur un horizon d’un an ; minimum réglementaire de 100 %.','KM1 ligne 20 (ligne 18 ÷ ligne 19).'],
+ ['Financement stable disponible (ASF)','Capitaux propres, dépôts et dettes pondérés selon leur stabilité à un an (100 % pour les fonds propres et la dette à plus d’un an, 90 à 95 % pour les dépôts de détail, moins pour le financement de gros court).','KM1 ligne 18.'],
+ ['Financement stable requis (RSF)','Actifs et engagements hors bilan pondérés selon leur liquidité : faible pour la trésorerie et les titres liquides, élevé pour les crédits à plus d’un an.','KM1 ligne 19.'],
+ ['Excédent de financement stable','ASF − RSF, en M€ : la marge en montant avant le minimum de 100 %.','KM1 ligne 18 − ligne 19.'],
+ ['Effets financement disponible et requis','Décomposition exacte de la variation du NSFR recalculé : effet de la variation de l’ASF et effet de la variation du RSF, trimestre par trimestre.','(ASF₁ − ASF₀) ÷ RSF₁ et ASF₀ ÷ RSF₁ − ASF₀ ÷ RSF₀.'],
+ ['Zones de lecture','Repères de l’outil, pas des seuils réglementaires : marge faible de 100 à 110 %, confortable de 110 à 130 %, abondante au-delà.','Comparaison du NSFR publié aux bornes 100, 110 et 130 %.']]],
 ['liq','Liquidité (LCR)','Modèle LIQ1 (détail du ratio de liquidité à court terme, LCR), dépôts trimestriels. Chaque valeur est la moyenne des 12 derniers mois (colonne T). L’onglet présente d’abord le LCR (coussin ÷ sorties nettes), puis les sorties et les entrées de trésorerie qui forment les sorties nettes.',[
  ['Excédent de liquidité','Montant d’actifs liquides au-delà de ce qu’exige le LCR : la marge de manœuvre en euros.','Coussin de liquidité (ligne 21) − sorties nettes de trésorerie (ligne 22).'],
  ['Entrées / sorties pondérées','Dépendance du LCR aux entrées de trésorerie attendues ; elles sont plafonnées à 75 % des sorties.','Total des entrées pondérées (ligne 20) ÷ total des sorties pondérées (ligne 16).'],
@@ -1934,7 +1941,7 @@ function curKeys(){const t=S.tab;
   if(t==='fonds')return[S.ckey];if(t==='liq')return[S.lkey];if(t==='mrel')return[S.k2key];if(t==='irrbb')return[S.irkey];if(t==='titri')return[S.sekey];if(t==='levier')return[S.lrkey];if(t==='marche')return[S.mkkey];if(t==='sa')return[S.sakey];if(t==='flux')return[S.flkey];
   if(t==='of')return[M[S.fkey]?S.fkey:'fl_gap_full'];if(t==='ofc')return[clKey(S.cmeas||'ratio',S.cbase||'e','0080')];if(t==='ofx')return c2cls()[2].map(([rc])=>c2k(S.c2m||'mr',rc));
   if(t==='rwa')return['ov1_total','ov1s_0010'];if(t==='fiche')return AX.flatMap(g=>g[1].map(x=>x[0]));if(t==='variation'||t==='trajectoire')return['cet1_ratio','cet1_amt','rwa','dcmp_fp','dcmp_rw','dcmp_risk','dcmp_oth','dcmp_net'];if(t==='croisements'){const X=XP.find(x=>x[0]===S.xp)||XP[0];return X[6]?X[6].flatMap(([m])=>[m+'_sh',m+'_dens']):X[2](S)}
-  if(t==='sec1')return sec1Keys();if(t==='secteurs'||t==='pays'){const m=S.mtr||'npl';const pk=(t==='secteurs'?'cq5_':'cq4_')+m;return[pk]}
+  if(t==='sec1')return sec1Keys();if(t==='nsfr')return['nsfr','asf','rsf','nsfrp_surplus','nsfrp_ea','nsfrp_er','nsfrp_zone'];if(t==='secteurs'||t==='pays'){const m=S.mtr||'npl';const pk=(t==='secteurs'?'cq5_':'cq4_')+m;return[pk]}
   return[]}
 /* --- Définitions des indicateurs LR2, MR1, MR2, CR4, CR5, CR8, CCR7, MR2B (même contrat que 10c : définition, enjeu, formule ; l'exemple chiffré vient de la piste d'audit) --- */
 const LRN={onbs:'au bilan (hors dérivés et opérations de financement de titres)',deriv:'sur dérivés',sft:'sur opérations de financement de titres (SFT : pensions livrées, prêts et emprunts de titres)',off:'hors bilan, après conversion en équivalent-crédit'};
@@ -2299,16 +2306,173 @@ async function dmExport(){const msg=$('#dmmsg');if(msg)msg.textContent='Prépara
     if(msg)msg.textContent=r==='declined'?'Téléchargement annulé.':r==='unavailable'?'Le téléchargement n’est pas possible dans cet affichage : ouvrez la page dans un navigateur.':`Fichier prêt : ${name}`}
   catch(e){if(msg)msg.textContent='Export impossible : '+(e.message||e)}}
 
+/* ---------- Liquidité : onglet NSFR (financement stable à un an, d'après KM1 lignes 18 à 20) ---------- */
+// NSFR = financement stable disponible (ASF) ÷ financement stable requis (RSF) ; minimum réglementaire 100 % (CRR art. 413).
+// Valeurs de fin de trimestre (KM1, colonne T). Les zones de lecture (110 %, 130 %) sont des repères de l'outil, pas des seuils réglementaires.
+const NZ=[[1.10,'Marge faible'],[1.30,'Confortable'],[Infinity,'Abondante']];
+const nzone=v=>v==null?'n.d.':v<1?'Sous le minimum':NZ.find(z=>v<z[0])[1];
+const nsfrP=()=>P.map((_,i)=>i).filter(i=>sel().some(b=>val('nsfr',b.id,i)!=null));
+// trimestres consécutifs où l'ASF et le RSF sont déposés
+function nqs(b,p0,p1){return P.map((_,i)=>i).filter(i=>i>=p0&&i<=p1&&val('asf',b,i)>0&&val('rsf',b,i)>0)}
+// décomposition exacte de la variation de ASF/RSF entre deux trimestres : effet ASF = (A1−A0)/R1 ; effet RSF = A0/R1 − A0/R0
+function ndec1(b,p0,p1){const A0=val('asf',b,p0),R0=val('rsf',b,p0),A1=val('asf',b,p1),R1=val('rsf',b,p1);if([A0,R0,A1,R1].some(x=>x==null||x<=0))return null;
+  return{r0:A0/R0,r1:A1/R1,ea:(A1-A0)/R1,er:A0/R1-A0/R0,A0,A1,R0,R1}}
+// sur plusieurs trimestres : calcul trimestre par trimestre puis somme (même méthode que la variation du CET1)
+function ndec(b,p0,p1){const qs=nqs(b,p0,p1);if(qs.length<2||qs[0]!==p0||qs[qs.length-1]!==p1)return null;const st=[];
+  for(let k=1;k<qs.length;k++){const d=ndec1(b,qs[k-1],qs[k]);if(!d)return null;st.push(d)}
+  const f=st[0],z=st[st.length-1];return{r0:f.r0,r1:z.r1,ea:st.reduce((t,d)=>t+d.ea,0),er:st.reduce((t,d)=>t+d.er,0),A0:f.A0,A1:z.A1,R0:f.R0,R1:z.R1,qs}}
+// lignes de calcul (piste d'audit) de la décomposition
+function ndecLines(b,p0,p1){const d=ndec(b,p0,p1);if(!d)return null;const per=`${qlab(p0)} → ${qlab(p1)}`,qs=d.qs,L={};
+  const step=(q0,q1)=>{const A0=inM('A0','asf',b,q0),R0=inM('R0','rsf',b,q0),A1=inM('A1','asf',b,q1),R1=inM('R1','rsf',b,q1),x=ndec1(b,q0,q1),pp=`${qlab(q0)} → ${qlab(q1)}`;
+    return{ea:dline({id:`nd|ea|${b}|${q0}|${q1}`,b,p:q1,per:pp,label:'Effet financement stable disponible (NSFR)',unit:'pct',pt:true,expr:'(A1-A0)/R1',inputs:[A0,A1,R1],shown:x.ea}),
+      er:dline({id:`nd|er|${b}|${q0}|${q1}`,b,p:q1,per:pp,label:'Effet financement stable requis (NSFR)',unit:'pct',pt:true,expr:'A0/R1-A0/R0',inputs:[A0,R0,R1],shown:x.er})}};
+  const S1=[];for(let k=1;k<qs.length;k++)S1.push(step(qs[k-1],qs[k]));
+  const agg=(id,lab)=>S1.length===1?S1[0][id]:dline({id:`ndv|${id}|${b}|${p0}|${p1}`,b,p:p1,per,label:lab,unit:'pct',pt:true,expr:S1.map((_,i)=>'S'+(i+1)).join('+'),inputs:S1.map((x,i)=>inL('S'+(i+1),x[id])),shown:S1.reduce((t,x)=>t+x[id].shown,0)});
+  L.ea=agg('ea','Effet financement stable disponible (NSFR)');L.er=agg('er','Effet financement stable requis (NSFR)');
+  L.net=dline({id:`ndv|net|${b}|${p0}|${p1}`,b,p:p1,per,label:'Variation du NSFR recalculé (ASF ÷ RSF)',unit:'pct',pt:true,expr:'A1/R1-A0/R0',inputs:[inM('A0','asf',b,p0),inM('R0','rsf',b,p0),inM('A1','asf',b,p1),inM('R1','rsf',b,p1)],shown:d.r1-d.r0});
+  return L}
+const nsurpLine=(b,p)=>{const A=val('asf',b,p),R=val('rsf',b,p);if(A==null||R==null)return null;
+  return dline({id:`ns|${b}|${p}`,b,p,per:qlab(p),label:'Excédent de financement stable (ASF − RSF)',unit:'amt',expr:'A-R',inputs:[inM('A','asf',b,p),inM('R','rsf',b,p)],shown:A-R})};
+const mE=v=>`${v<0?'−':''}${nf(Math.abs(v)/1e6,0)} M€`,sgP=(v,d=1)=>{const t=nf(Math.abs(v)*100,d);return /^0(,0+)?$/.test(t)?t:`${v>=0?'+':'−'}${t}`};
+// diverging (vert : hausse, rouge : baisse) pour les variations en points
+function dcol(v,mx){if(v==null)return'';const t=Math.min(1,Math.abs(v)/Math.max(mx,1e-9));const c=v>=0?'var(--ok)':'var(--ko)';return`background:color-mix(in srgb, ${c} ${Math.round(8+t*52)}%, var(--card));`}
+
+// 1. NSFR par banque sur une échelle centrée sur la zone utile, avec les zones de lecture, le minimum et la médiane
+function drawNsfrBands(el,p){
+  const rows=sel().map(b=>({b,v:val('nsfr',b.id,p),f:flag('nsfr',b.id,p)})).filter(r=>r.v!=null).sort((a,c)=>c.v-a.v);
+  if(!rows.length){el.innerHTML='<p class="note">Aucune donnée pour cette sélection.</p>';return}
+  const W=el.clientWidth||600,narrow=W<520,ml=narrow?104:122,mr=narrow?56:70,top=26,rh=28,H=top+rows.length*rh+26,iw=W-ml-mr;
+  const lo=Math.min(0.95,Math.floor((Math.min(...rows.map(r=>r.v))-0.03)*20)/20),hi=Math.max(1.4,Math.ceil((Math.max(...rows.map(r=>r.v))+0.04)*20)/20),X=v=>ml+(v-lo)/(hi-lo)*iw,med=median(rows.map(r=>r.v));
+  let s=`<svg width="${W}" height="${H}" role="img" aria-label="NSFR par banque au ${qlab(p)}">`;
+  const band=(a,b,c,o,l)=>{const x0=X(Math.max(a,lo)),x1=X(Math.min(b,hi));if(x1<=x0)return;s+=`<rect x="${x0}" y="${top-6}" width="${x1-x0}" height="${rows.length*rh+6}" style="fill:${c};fill-opacity:${o}"/>`;if(!narrow||x1-x0>60)s+=`<text x="${(x0+x1)/2}" y="${top-10}" text-anchor="middle" style="fill:var(--ink3)">${l}</text>`};
+  band(lo,1,'var(--ko)',.10,'');band(1,1.10,'var(--warn)',.14,'Marge faible');band(1.10,1.30,'var(--ok)',.08,'Confortable');band(1.30,hi,'var(--ok)',.16,'Abondante');
+  niceTicks(lo,hi,narrow?3:5).filter(t=>t>=lo&&t<=hi).forEach(t=>{s+=`<text x="${X(t)}" y="${H-6}" text-anchor="middle">${nf(t*100,0)} %</text>`});
+  s+=`<line x1="${X(1)}" x2="${X(1)}" y1="${top-6}" y2="${top+rows.length*rh}" style="stroke:var(--ink)" stroke-width="2"/>`;
+  if(med!=null)s+=`<line x1="${X(med)}" x2="${X(med)}" y1="${top-6}" y2="${top+rows.length*rh}" style="stroke:var(--ink2)" stroke-dasharray="4 3"/>`;
+  rows.forEach((r,i)=>{const cy=top+i*rh+rh/2;s+=`<text class="nm" x="${ml-10}" y="${cy+4}" text-anchor="end"${nmw(r.b.id)}>${esc(r.b.short)}</text><line x1="${X(1)}" x2="${X(r.v)}" y1="${cy}" y2="${cy}" style="stroke:${bcol(r.b.id)}" stroke-width="2"/><circle cx="${X(r.v)}" cy="${cy}" r="6" style="fill:${bcol(r.b.id)};stroke:var(--card)" stroke-width="2"/><text class="val" x="${X(r.v)+11}" y="${cy+4}">${nf(r.v*100,1)} %${r.f?' †':''}</text><rect data-i="${i}" x="0" y="${top+i*rh}" width="${W}" height="${rh}" fill="transparent"/>`});
+  el.innerHTML=s+'</svg>';
+  el.querySelectorAll('rect[data-i]').forEach(rc=>{const r=rows[+rc.dataset.i],A=val('asf',r.b.id,p),R=val('rsf',r.b.id,p);const h=e=>showTip(`<b>${esc(r.b.short)}</b> <span style="color:var(--ink3)">· ${qlab(p)}</span><div class="r"><span>NSFR</span><span class="n">${nf(r.v*100,1)} %</span></div>${A!=null&&R!=null?`<div class="r"><span>Excédent (ASF − RSF)</span><span class="n">${mE(A-R)}</span></div>`:''}<div class="r"><span>Zone de lecture</span><span class="n">${nzone(r.v)}</span></div>${med!=null?`<small>${sgP(r.v-med)} pt vs médiane du panel (${nf(med*100,1)} %)</small>`:''}${r.f?`<small>† ${esc(r.f)}</small>`:''}`,e);rc.addEventListener('pointermove',h);rc.addEventListener('pointerdown',h);rc.addEventListener('pointerleave',hideTip)});
+}
+// 2. évolution du NSFR : toutes les banques en gris, la banque choisie en couleur, la médiane du panel en pointillés
+function drawNsfrTrend(el,xs,bid){
+  const banks=sel().filter(b=>xs.some(x=>val('nsfr',b.id,x)!=null));if(!banks.length){el.innerHTML='<p class="note">Aucune donnée pour cette sélection.</p>';return}
+  const W=el.clientWidth||600,narrow=W<520,H=narrow?260:330,m={l:narrow?46:56,r:narrow?92:130,t:14,b:30};
+  const meds=xs.map(x=>median(banks.map(b=>val('nsfr',b.id,x))));
+  const all=banks.flatMap(b=>xs.map(x=>val('nsfr',b.id,x))).filter(v=>v!=null).concat([1]);
+  const tk=niceTicks(Math.min(...all)-0.02,Math.max(...all)+0.02,4),y0=tk[0],y1=tk[tk.length-1],iw=W-m.l-m.r,ih=H-m.t-m.b,xp=12;
+  const X=i=>xs.length===1?m.l+iw/2:m.l+xp+i*(iw-2*xp)/(xs.length-1),Y=v=>m.t+ih-(v-y0)/(y1-y0)*ih;
+  let s=`<svg width="${W}" height="${H}" role="img" aria-label="Évolution du NSFR par trimestre">`;
+  tk.forEach(t=>{s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}" style="stroke:var(--grid)"/><text x="${m.l-8}" y="${Y(t)+4}" text-anchor="end">${nf(t*100,0)} %</text>`});
+  if(1>=y0&&1<=y1)s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(1)}" y2="${Y(1)}" style="stroke:var(--ink)" stroke-width="1.5"/><text x="${W-m.r+6}" y="${Y(1)+4}" style="fill:var(--ink2)">Minimum 100 %</text>`;
+  xs.forEach((x,i)=>{s+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle">${narrow?qlab(x).replace(' 20',' ’'):qlab(x)}</text>`});
+  const path=vs=>{let d='',pen=false;vs.forEach((v,i)=>{if(v==null){pen=false;return}d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);pen=true});return d};
+  const ends=[];
+  banks.filter(b=>b.id!==bid).forEach(b=>{s+=`<path d="${path(xs.map(x=>val('nsfr',b.id,x)))}" fill="none" style="stroke:var(--oth)" stroke-width="1.2"/>`});
+  s+=`<path d="${path(meds)}" fill="none" style="stroke:var(--ink2)" stroke-width="2" stroke-dasharray="5 4"/>`;const lm=meds.map((v,i)=>[v,i]).filter(z=>z[0]!=null).pop();if(lm)ends.push({y:Y(lm[0]),x:X(lm[1]),t:'Médiane du panel',c:'var(--ink2)'});
+  const fb_=banks.find(b=>b.id===bid);if(fb_){const vs=xs.map(x=>val('nsfr',bid,x));s+=`<path d="${path(vs)}" fill="none" style="stroke:var(--s${bid+1})" stroke-width="3" stroke-linejoin="round"/>`;
+    vs.forEach((v,i)=>{if(v!=null)s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="4" style="fill:var(--s${bid+1});stroke:var(--card)" stroke-width="2"/>`});const lv=vs.map((v,i)=>[v,i]).filter(z=>z[0]!=null).pop();if(lv)ends.push({y:Y(lv[0]),x:X(lv[1]),t:fb_.short,c:`var(--s${bid+1})`,b:1})}
+  const ys=spread(ends.map(e=>e.y),14);ends.forEach((e,i)=>{s+=`<text x="${e.x+10}" y="${ys[i]+4}" style="fill:${e.c};font-weight:${e.b?700:400}">${esc(e.t)}</text>`});
+  s+=`<line id="ncx" y1="${m.t}" y2="${m.t+ih}" style="stroke:var(--ink3)" stroke-dasharray="3 3" visibility="hidden"/><rect id="nov" x="${m.l}" y="0" width="${iw}" height="${H-m.b}" fill="transparent"/></svg>`;
+  el.innerHTML=s;const cx=el.querySelector('#ncx'),ov=el.querySelector('#nov');
+  const mv=e=>{const r=ov.getBoundingClientRect(),px=e.clientX-r.left+m.l;let bi=0,bd=1e9;xs.forEach((x,i)=>{const d=Math.abs(X(i)-px);if(d<bd){bd=d;bi=i}});const x=xs[bi];cx.setAttribute('x1',X(bi));cx.setAttribute('x2',X(bi));cx.setAttribute('visibility','visible');
+    const rs=banks.map(b=>({b,v:val('nsfr',b.id,x)})).filter(z=>z.v!=null).sort((a,c)=>c.v-a.v);
+    showTip(`<b>${qlab(x)}</b> <span style="color:var(--ink3)">· médiane ${meds[bi]!=null?nf(meds[bi]*100,1)+' %':'n.d.'}</span>`+rs.map(z=>`<div class="r"><span${z.b.id===bid?' style="font-weight:700"':''}><i style="background:${z.b.id===bid?`var(--s${bid+1})`:'var(--oth)'}"></i>${esc(z.b.short)}</span><span class="n">${nf(z.v*100,1)} %</span></div>`).join(''),e)};
+  ov.addEventListener('pointermove',mv);ov.addEventListener('pointerdown',mv);ov.addEventListener('pointerleave',()=>{cx.setAttribute('visibility','hidden');hideTip()});
+}
+// 3. décomposition de la variation : NSFR de départ, effet ASF, effet RSF, NSFR d'arrivée
+function drawNsfrWF(el,d,p0,p1){
+  const steps=[{l:`NSFR ${qlab(p0)}`,tot:d.r0},{l:'Effet financement disponible',eff:d.ea,sub:`ASF ${d.A1>=d.A0?'+':'−'}${nf(Math.abs(d.A1-d.A0)/1e6,0)} M€`},{l:'Effet financement requis',eff:d.er,sub:`RSF ${d.R1>=d.R0?'+':'−'}${nf(Math.abs(d.R1-d.R0)/1e6,0)} M€`},{l:`NSFR ${qlab(p1)}`,tot:d.r1}];
+  let c=d.r0;steps.forEach(x=>{if(x.eff!=null){x.a=c;c+=x.eff;x.b=c}});
+  const pts=steps.flatMap(x=>x.tot!=null?[x.tot]:[x.a,x.b]),lo0=Math.min(...pts),hi0=Math.max(...pts),pad=Math.max((hi0-lo0)*.3,.005);
+  const W=el.clientWidth||600,narrow=W<520,ml=narrow?150:210,mr=narrow?70:150,rh=36,bh=18,top=8,H=top+steps.length*rh+26,iw=W-ml-mr;
+  const tk=niceTicks(lo0-pad,hi0+pad,4),x0=tk[0],x1=tk[tk.length-1],X=v=>ml+(v-x0)/(x1-x0)*iw;
+  let s=`<svg width="${W}" height="${H}" role="img" aria-label="Décomposition de la variation du NSFR">`;
+  tk.forEach(t=>{s+=`<line x1="${X(t)}" x2="${X(t)}" y1="${top}" y2="${H-22}" style="stroke:var(--grid)"/><text x="${X(t)}" y="${H-6}" text-anchor="middle">${nf(t*100,1)} %</text>`});
+  steps.forEach((x,i)=>{const y=top+i*rh+(rh-bh)/2,cy=top+i*rh+rh/2;s+=`<text class="nm" x="${ml-10}" y="${cy+4}" text-anchor="end"${x.tot!=null?' style="font-weight:600"':''}>${esc(x.l)}</text>`;
+    if(x.tot!=null)s+=`<rect x="${ml}" y="${y}" width="${Math.max(X(x.tot)-ml,1)}" height="${bh}" rx="3" style="fill:var(--ink3)"/><text class="val" x="${X(x.tot)+8}" y="${cy+4}">${nf(x.tot*100,2)} %</text>`;
+    else{const a=Math.min(X(x.a),X(x.b)),w=Math.max(Math.abs(X(x.b)-X(x.a)),1.5);s+=`<rect x="${a}" y="${y}" width="${w}" height="${bh}" rx="2" style="fill:${x.eff>=0?'var(--ok)':'var(--ko)'}"/><text class="val" x="${a+w+8}" y="${cy+4}">${sgP(x.eff,2)} pt</text>`;
+      if(!narrow)s+=`<text x="${W-4}" y="${cy+4}" text-anchor="end">${x.sub}</text>`;s+=`<line x1="${X(x.b)}" x2="${X(x.b)}" y1="${y+bh}" y2="${y+rh}" style="stroke:var(--ink3)" stroke-dasharray="2 2"/>`}});
+  el.innerHTML=s+'</svg>';
+}
+// 4. excédent de financement stable (ASF − RSF), en M€, classé
+function drawNsfrSurplus(el,p){
+  const rows=sel().map(b=>{const A=val('asf',b.id,p),R=val('rsf',b.id,p);return{b,v:A!=null&&R!=null?A-R:null,R}}).filter(r=>r.v!=null).sort((a,c)=>c.v-a.v);
+  if(!rows.length){el.innerHTML='<p class="note">Aucune donnée pour cette sélection.</p>';return}
+  const W=el.clientWidth||600,narrow=W<520,ml=narrow?104:122,mr=narrow?96:150,rh=28,bh=16,top=6,H=top+rows.length*rh+22,iw=W-ml-mr,mx=Math.max(...rows.map(r=>Math.abs(r.v))),X=v=>ml+Math.max(0,v)/mx*iw;
+  let s=`<svg width="${W}" height="${H}" role="img" aria-label="Excédent de financement stable au ${qlab(p)}">`;
+  niceTicks(0,mx/1e9,narrow?3:4).filter(t=>t*1e9<=mx).forEach(t=>{s+=`<line x1="${X(t*1e9)}" x2="${X(t*1e9)}" y1="${top}" y2="${top+rows.length*rh}" style="stroke:var(--grid)"/><text x="${X(t*1e9)}" y="${H-6}" text-anchor="middle">${nf(t*1000,0)}</text>`});
+  rows.forEach((r,i)=>{const cy=top+i*rh+rh/2;s+=`<text class="nm" x="${ml-10}" y="${cy+4}" text-anchor="end"${nmw(r.b.id)}>${esc(r.b.short)}</text><rect x="${ml}" y="${cy-bh/2}" width="${Math.max(2,X(r.v)-ml)}" height="${bh}" rx="3" style="fill:${bcol(r.b.id)}"/><text class="val" x="${X(r.v)+8}" y="${cy+4}">${mE(r.v)}${narrow?'':` · ${nf(r.v/r.R*100,0)} % du RSF`}</text>`});
+  el.innerHTML=s+`<text x="${W-4}" y="${H-6}" text-anchor="end" style="fill:var(--ink3)">M€</text></svg>`;
+}
+
+function viewNsfr(){
+  if(!M.nsfr||!M.asf||!M.rsf)return'<p class="note">Données NSFR indisponibles.</p>';
+  const xs=nsfrP();if(!xs.length)return'<p class="note">Sélectionnez au moins une banque.</p>';
+  const pc=perSel(xs),p=S.per;let bid=fb();if(bid==null||!S.sel.has(bid))bid=sel()[0].id;
+  if(S.n1==null||!xs.includes(S.n1))S.n1=xs[xs.length-1];if(S.n0==null||!xs.includes(S.n0)||S.n0>=S.n1)S.n0=xs[0]<S.n1?xs[0]:S.n1;
+  const ps=(id,cur,f)=>`<select id="${id}">${xs.filter(f).map(i=>`<option value="${i}" ${i===cur?'selected':''}>${qlab(i)} (${dlab(i)})</option>`).join('')}</select>`;
+  const ctl=`<div class="ctl">${pc}${bankSel(bid)}</div>`,bk=B[bid];
+  const dmc=LC();
+  sel().forEach(b=>{xs.forEach(x=>dmc.m('nsfr',b.id,x));['asf','rsf','lcr'].forEach(k=>dmc.m(k,b.id,p));dmc.add(nsurpLine(b.id,p));
+    for(let k=1;k<xs.length;k++)dmc.add(dLine('nsfr',b.id,xs[k-1],xs[k]));const L=ndecLines(b.id,S.n0,S.n1);if(L){dmc.add(L.ea);dmc.add(L.er);dmc.add(L.net)}});
+  dmc.add(medLine('nsfr',p));xs.forEach(x=>dmc.add(medLine('nsfr',x)));
+  // tableau 1 : grille de lecture à la date choisie
+  const g0=xs[0],lastOf=b=>{const v=xs.filter(x=>val('nsfr',b.id,x)!=null);return v.length?v[v.length-1]:null},firstOf=b=>{const v=xs.filter(x=>val('nsfr',b.id,x)!=null);return v.length?v[0]:null};
+  const head1=['Banque',`NSFR ${qlab(p)}`,'Zone de lecture','Écart à la médiane','Excédent (ASF − RSF)','Excédent en % du RSF','Variation sur la période','Moteur principal de la variation'],med=medOf('nsfr',p);
+  const rows1=sel().map(b=>{const v=val('nsfr',b.id,p),A=val('asf',b.id,p),R=val('rsf',b.id,p),f0=firstOf(b),f1=lastOf(b),d=f0!=null&&f1!=null&&f0<f1?ndec(b.id,f0,f1):null;
+    const mot=!d?'n.d.':Math.abs(d.r1-d.r0)<0.005?'Stable (moins de 0,5 pt)':(Math.abs(d.ea)>=Math.abs(d.er)?(d.ea>=0?'Hausse du financement disponible':'Baisse du financement disponible'):(d.er>=0?'Baisse du financement requis':'Hausse du financement requis'));
+    return[b.short,v==null?'n.d.':nf(v*100,1)+' %'+(flag('nsfr',b.id,p)?' †':''),nzone(v),v==null||med==null?'n.d.':sgP(v-med)+' pt',A==null||R==null?'n.d.':mE(A-R),A==null||R==null?'n.d.':nf((A-R)/R*100,1)+' %',f0!=null&&f1!=null&&f0<f1?`${sgP(val('nsfr',b.id,f1)-val('nsfr',b.id,f0))} pt (${qlab(f0)} → ${qlab(f1)})`:'n.d.',mot]});
+  // tableau 2 : niveaux et variations trimestrielles
+  const tr=xs.slice(1).map((x,i)=>[xs[i],x]),head2=['Banque',...xs.map(x=>qlab(x)),...tr.map(([a,z])=>`Δ ${qlab(a).replace(' 20',' ’')} → ${qlab(z).replace(' 20',' ’')}`),`Δ ${qlab(xs[0])} → ${qlab(xs[xs.length-1])}`];
+  const dmx=Math.max(0.01,...sel().flatMap(b=>tr.map(([a,z])=>{const u=val('nsfr',b.id,a),w=val('nsfr',b.id,z);return u==null||w==null?0:Math.abs(w-u)})));
+  const cells2=sel().map(b=>{const lv=xs.map(x=>val('nsfr',b.id,x)),dl=tr.map(([a,z])=>{const u=val('nsfr',b.id,a),w=val('nsfr',b.id,z);return u==null||w==null?null:w-u}),u0=lv[0],u1=lv[lv.length-1],dt=u0==null||u1==null?null:u1-u0;return{b,lv,dl,dt}});
+  const rows2=cells2.map(c=>[c.b.short,...c.lv.map(v=>v==null?'n.d.':nf(v*100,1)+' %'),...c.dl.map(v=>v==null?'n.d.':sgP(v)+' pt'),c.dt==null?'n.d.':sgP(c.dt)+' pt']);
+  const tdx=(v,mx)=>v==null?'<td class="num">n.d.</td>':`<td class="num" style="${dcol(v,mx)}color:var(--ink)">${sgP(v)} pt</td>`;
+  const t2=`<div class="tablewrap"><table class="nsfrt"><thead><tr>${head2.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${cells2.map(c=>`<tr><td>${esc(c.b.short)}</td>${c.lv.map(v=>`<td class="num">${v==null?'n.d.':nf(v*100,1)+' %'}</td>`).join('')}${c.dl.map(v=>tdx(v,dmx)).join('')}${tdx(c.dt,Math.max(dmx,...cells2.map(z=>Math.abs(z.dt||0))))}</tr>`).join('')}</tbody></table></div>`;
+  // décomposition : banque choisie + comparaison des banques
+  const d=ndec(bid,S.n0,S.n1),head3=['Banque',`NSFR ${qlab(S.n0)}`,'Effet financement disponible','Effet financement requis',`NSFR ${qlab(S.n1)}`,'Variation','Variation de l’ASF','Variation du RSF'];
+  const rows3=sel().map(b=>{const x=ndec(b.id,S.n0,S.n1);if(!x)return[b.short,...head3.slice(1).map(()=>'n.d.')];return[b.short,nf(x.r0*100,2)+' %',sgP(x.ea,2)+' pt',sgP(x.er,2)+' pt',nf(x.r1*100,2)+' %',sgP(x.r1-x.r0,2)+' pt',`${x.A1>=x.A0?'+':'−'}${nf(Math.abs(x.A1/x.A0-1)*100,1)} %`,`${x.R1>=x.R0?'+':'−'}${nf(Math.abs(x.R1/x.R0-1)*100,1)} %`]});
+  const SCQ=['LCR sous la médiane · NSFR au-dessus','Au-dessus de la médiane sur les deux horizons','Sous la médiane sur les deux horizons','LCR au-dessus · NSFR sous la médiane'];
+  // exemples de lecture
+  const l1=lecB(p,['nsfr','asf','rsf']);let e1='';
+  if(l1){const b=l1.b.id,v=val('nsfr',b,p),A=val('asf',b,p),R=val('rsf',b,p);e1=LP(`${esc(l1.b.short)} dispose de ${mE(A)} de financement stable (capitaux propres, dépôts et dettes jugés stables à un an, pondérés) pour un besoin de ${mE(R)} (actifs et engagements pondérés selon leur liquidité). Son NSFR est donc de ${nf(v*100,1)} %${mdY('nsfr',p)}, zone « ${nzone(v).toLowerCase()} » : l’excédent de ${mE(A-R)} représente ${nf((A-R)/R*100,0)} % du besoin. C’est la marge dont la banque dispose avant d’atteindre le minimum de 100 %, par exemple si une partie de ses dépôts devenait moins stable ou si son bilan de crédit grossissait.`,l1.why)}
+  let e2='';if(d){const nm=bk.short,dv=d.r1-d.r0,main=Math.abs(d.ea)>=Math.abs(d.er)?'ea':'er';
+    e2=LP(`Entre ${qlab(S.n0)} et ${qlab(S.n1)}, le NSFR de ${esc(nm)} passe de ${nf(d.r0*100,1)} % à ${nf(d.r1*100,1)} % (${sgP(dv)} pt). Le financement stable disponible ${d.A1>=d.A0?'augmente':'diminue'} de ${nf(Math.abs(d.A1/d.A0-1)*100,1)} %, ce qui ${d.ea>=0?'ajoute':'retire'} ${nf(Math.abs(d.ea)*100,1)} pt ; le besoin de financement stable ${d.R1>=d.R0?'augmente':'diminue'} de ${nf(Math.abs(d.R1/d.R0-1)*100,1)} %, ce qui ${d.er>=0?'ajoute':'retire'} ${nf(Math.abs(d.er)*100,1)} pt. Le moteur principal est donc ${main==='ea'?'le passif (les ressources stables)':'l’actif (le besoin de financement)'} : ${main==='er'&&d.er<0?'le bilan qui exige un financement stable grandit plus vite que les ressources stables.':main==='er'?'le besoin de financement recule, ce qui améliore le ratio à ressources comparables.':d.ea>=0?'la banque renforce ses ressources stables.':'les ressources stables reculent.'}`,'banque choisie')}
+  const l3=lecB(p,['nsfr','lcr']);let e3='';
+  if(l3){const b=l3.b.id,n=val('nsfr',b,p),c=val('lcr',b,p),mn=medOf('nsfr',p),mc=medOf('lcr',p);e3=LP(`${esc(l3.b.short)} a un NSFR de ${nf(n*100,0)} % (médiane ${nf(mn*100,0)} %) et un LCR de ${nf(c*100,0)} % (médiane ${nf(mc*100,0)} %) : elle est ${n>=mn&&c>=mc?'au-dessus de la médiane sur les deux horizons':n>=mn?'mieux placée sur la liquidité structurelle (un an) que sur la liquidité de court terme (30 jours)':c>=mc?'mieux placée sur la liquidité de court terme (30 jours) que sur la liquidité structurelle (un an)':'sous la médiane sur les deux horizons'}. Le LCR mesure la capacité à traverser un stress de 30 jours avec un coussin d’actifs liquides ; le NSFR, l’adéquation entre la durée des ressources et celle des emplois.`,l3.why)}
+  S.redraw=()=>{drawNsfrBands($('#n1'),p);drawNsfrTrend($('#n2'),xs,bid);if(d)drawNsfrWF($('#n3'),d,S.n0,S.n1);drawNsfrSurplus($('#n4'),p);drawScatter($('#n5'),'lcr','nsfr',p,SCQ,S.path,'rsf')};
+  return`${ctl}
+  <section class="card"><div class="hd"><h2>Marge de sécurité : NSFR par banque</h2><span>${qlab(p)} · trait plein : minimum réglementaire de 100 % · pointillés : médiane du panel</span></div><div class="chart" id="n1"></div>
+  <p class="note" style="margin-top:6px">Zones de lecture proposées par l’outil (ce ne sont pas des seuils réglementaires) : marge faible de 100 à 110 %, confortable de 110 à 130 %, abondante au-delà de 130 %.</p>${e1}</section>
+  <section class="card"><div class="hd"><h2>Évolution du NSFR</h2><span>${qlab(xs[0])} → ${qlab(xs[xs.length-1])} · ${esc(bk.short)} en couleur (menu « Banque ») · autres banques en gris · médiane du panel en pointillés</span></div><div class="chart" id="n2"></div></section>
+  <section class="card"><div class="hd"><h2>Variations trimestrielles du NSFR</h2><span>niveaux puis variations en points · vert : hausse, rouge : baisse</span></div>${t2}<p style="margin-top:8px">${copyBtn(()=>tsv(head2,rows2))}</p></section>
+  <section class="card"><div class="hd"><h2>${esc(bk.short)} : d’où vient la variation du NSFR ?</h2><span>en points de NSFR</span></div><div class="ctl"><label>Du${ps('n0',S.n0,i=>i<S.n1)}</label><label>Au${ps('n1',S.n1,i=>i>xs[0])}</label></div>${d?`<div class="chart" id="n3"></div>`:'<p class="note">Données insuffisantes pour cette banque sur cette période.</p>'}${e2}
+  <div class="tablewrap" style="margin-top:12px"><table><thead><tr>${head3.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows3.map(r=>`<tr>${r.map((c,j)=>`<td${j?' class="num"':''}>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p style="margin-top:8px">${copyBtn(()=>tsv(head3,rows3))}</p>
+  <p class="note" style="margin-top:8px">L’effet financement disponible est la variation de l’ASF rapportée au RSF de fin de période ; l’effet financement requis mesure, à ASF constant, l’effet de la variation du RSF (négatif quand le besoin augmente). La somme des deux est exactement la variation du NSFR recalculé (ASF ÷ RSF). Sur plusieurs trimestres, la décomposition est faite trimestre par trimestre puis additionnée, comme pour la variation du CET1.</p></section>
+  <section class="card"><div class="hd"><h2>Excédent de financement stable</h2><span>${qlab(p)} · ASF − RSF, en M€ et en % du RSF</span></div><div class="chart" id="n4"></div></section>
+  <section class="card"><div class="hd"><h2>Liquidité structurelle et liquidité de court terme</h2><span>${qlab(p)} · NSFR (un an) × LCR (30 jours) · pointillés : médianes · taille des bulles : financement stable requis</span></div><div class="ctl"><label class="chk"><input type="checkbox" id="path" ${S.path?'checked':''}> Afficher le parcours des trimestres précédents</label></div><div class="chart" id="n5"></div>${e3}</section>
+  <section class="card"><div class="hd"><h2>Grille de lecture</h2><span>${qlab(p)} · zone, marge et dynamique sur la période disponible</span></div><div class="tablewrap"><table><thead><tr>${head1.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows1.map(r=>`<tr>${r.map((c,j)=>`<td${j&&j<7&&j!==2?' class="num"':''}>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p style="margin-top:8px">${copyBtn(()=>tsv(head1,rows1))}</p>
+  <p class="note" style="margin-top:8px">Comment lire : (1) la zone situe la marge par rapport au minimum de 100 % ; (2) l’écart à la médiane compare la banque au panel ; (3) l’excédent en M€ donne la marge réelle, à rapporter à la taille du bilan ; (4) la variation et son moteur disent si la marge se construit par le passif (ressources stables) ou se consomme par l’actif (croissance des emplois à financer). Un NSFR très élevé n’est pas forcément optimal : le financement stable coûte plus cher que le financement court, et un excédent important peut peser sur la rentabilité.</p></section>
+  <p class="note">Le NSFR (ratio de financement stable net, CRR art. 413 et 428a à 428az) rapporte le financement stable disponible (ASF : capitaux propres, dépôts et dettes, pondérés selon leur stabilité à un an) au financement stable requis (RSF : actifs et engagements hors bilan, pondérés selon leur liquidité). Source : KM1 lignes 18 (ASF), 19 (RSF) et 20 (NSFR), valeurs de fin de trimestre. Le ratio affiché est le ratio publié ; la décomposition utilise le ratio recalculé (ASF ÷ RSF), qui peut s’en écarter de quelques centièmes (arrondis). Le détail du NSFR par nature de ressources et d’emplois (modèle LIQ2) n’est pas encore intégré.</p>
+  ${dmCard({table:{head:head1,rows:rows1},lines:dmc.a})}`
+}
+Object.assign(PSEUDO,{
+ nsfrp_surplus:['nsfr','Excédent de financement stable (ASF − RSF)','Différence entre le financement stable disponible et le financement stable requis, en millions d’euros ; rapportée au RSF, elle est égale au NSFR moins 100 %.','Donne la marge réelle avant le minimum de 100 %, en montant : à NSFR égal, une grande banque dispose d’un excédent bien plus important. C’est ce montant que la banque pourrait perdre en ressources stables (ou ajouter en emplois à financer) sans passer sous le minimum.','KM1 ligne 18 − ligne 19.'],
+ nsfrp_ea:['nsfr','Effet financement stable disponible (variation du NSFR)','Part de la variation du NSFR due à l’évolution du financement stable disponible (ASF), rapportée au financement requis de fin de période.','Positif quand les ressources stables augmentent (hausse des dépôts de la clientèle, émissions de dette longue, renforcement des fonds propres), négatif quand elles reculent ou deviennent moins stables.','(ASF₁ − ASF₀) ÷ RSF₁, trimestre par trimestre puis somme.'],
+ nsfrp_er:['nsfr','Effet financement stable requis (variation du NSFR)','Part de la variation du NSFR due à l’évolution du financement stable requis (RSF), à financement disponible constant.','Négatif quand le besoin de financement stable augmente (croissance des crédits, actifs moins liquides, engagements hors bilan), positif quand il diminue. Attention au sens : un effet négatif signifie que le RSF a augmenté.','ASF₀ ÷ RSF₁ − ASF₀ ÷ RSF₀, trimestre par trimestre puis somme.'],
+ nsfrp_zone:['nsfr','Zone de lecture du NSFR','Classement proposé par l’outil : sous le minimum (moins de 100 %), marge faible (100 à 110 %), confortable (110 à 130 %), abondante (au-delà de 130 %).','Repère de lecture, pas un seuil réglementaire : seul le minimum de 100 % est exigé. Les bornes de 110 % et 130 % servent à repérer rapidement les marges étroites et les excédents importants.','Comparaison du NSFR publié (KM1 ligne 20) aux bornes 100 %, 110 % et 130 %.']});
+Object.entries(PSEUDO).filter(([k])=>k.startsWith('nsfrp_')).forEach(([k,[tab,n,d,e,f]])=>dd(tab,new RegExp('^'+k+'$'),{n,d,e,f,pseudo:1}));
+
 /* ---------- pilotage ---------- */
 function renderChips(){
-  const col=S.ref!=null||['capital','credit','of','ofc','ofx','ofq','marges','modeles','croisements','fonds','liq','mrel','irrbb','titri','levier','marche','sa','flux'].includes(S.tab);
+  const col=S.ref!=null||['capital','credit','of','ofc','ofx','ofq','marges','modeles','croisements','fonds','liq','nsfr','mrel','irrbb','titri','levier','marche','sa','flux'].includes(S.tab);
   $('#chips').innerHTML='<span class="lab">Banques</span>'+B.map(b=>`<button class="chip" type="button" data-b="${b.id}" aria-pressed="${S.sel.has(b.id)}"><i style="${col?`background:${bcol(b.id)}`:''}"></i>${esc(b.short)}</button>`).join('')+'<button class="link" type="button" data-all="1">Tout sélectionner</button>'+`<label class="refsel">Banque de référence<select id="ref"><option value="">Aucune</option>${B.map(b=>`<option value="${b.id}" ${b.id===S.ref?'selected':''}>${esc(b.short)}</option>`).join('')}</select></label>`;
   $('#chips').style.display=['notes','lexique','qualite','legal'].includes(S.tab)?'none':'flex';
 }
 function renderTabs(){const sc=secOf(S.tab);S.last[sc[0]]=S.tab;$('#secs').innerHTML=SECTIONS.map(([k,l])=>`<button type="button" data-s="${k}" aria-pressed="${k===sc[0]}">${l}</button>`).join('');$('#tabs').innerHTML=sc[2].map(k=>`<button role="tab" type="button" data-t="${k}" aria-selected="${k===S.tab}">${TL[k]}</button>`).join('')}
 // onglet -> fonction qui produit son contenu ; capital, marges, modèles internes et crédit partagent viewSeries
 const VIEWS={fiche:viewFiche,legal:viewLegal,alertes:viewAlertes,croisements:viewCroisements,trajectoire:viewTrajectoire,credit:viewCredit,sec1:viewSec1,qualite:viewQualite,variation:viewVariation,rwa:viewRwa,
-  of:viewOF,fonds:()=>viewParts('fonds'),liq:viewLiq,mrel:()=>viewRT('mrel'),irrbb:()=>viewRT('irrbb'),titri:()=>viewRT('titri'),levier:()=>viewRT2('levier'),marche:()=>viewRT2('marche'),sa:()=>viewRT2('sa'),flux:()=>viewRT2('flux'),ofc:viewClasses,ofx:viewExpo,ofq:viewCompare,secteurs:()=>viewMatrix('secteurs'),pays:()=>viewMatrix('pays'),notes:viewNotes,lexique:viewLexique};
+  of:viewOF,fonds:()=>viewParts('fonds'),liq:viewLiq,nsfr:viewNsfr,mrel:()=>viewRT('mrel'),irrbb:()=>viewRT('irrbb'),titri:()=>viewRT('titri'),levier:()=>viewRT2('levier'),marche:()=>viewRT2('marche'),sa:()=>viewRT2('sa'),flux:()=>viewRT2('flux'),ofc:viewClasses,ofx:viewExpo,ofq:viewCompare,secteurs:()=>viewMatrix('secteurs'),pays:()=>viewMatrix('pays'),notes:viewNotes,lexique:viewLexique};
 function render(){
   hideTip();renderTabs();renderChips();S.redraw=null;
   const m=$('#main');
@@ -2325,7 +2489,7 @@ $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(
 $('#chips').addEventListener('click',e=>{const c=e.target.closest('[data-b]');if(c){const id=+c.dataset.b;S.sel.has(id)?S.sel.delete(id):S.sel.add(id);render();return}if(e.target.closest('[data-all]')){B.forEach(b=>S.sel.add(b.id));render()}});
 $('#chips').addEventListener('change',e=>{if(e.target.id!=='ref')return;S.ref=e.target.value===''?null:+e.target.value;if(S.ref!=null){S.bank=S.ref;S.sel.add(S.ref)}render()});
 // menus des onglets : identifiant du menu -> clé de l'état S ; les menus de période ou de banque sont numériques
-const CTL_TXT=['key','ckey','lkey','xp','mkey','c6','pf','fkey','cmeas','cbase','c2m','c2c','k2key','irkey','sekey','lrkey','mkkey','sakey','flkey','fltpl','cmpm','cmpb','cmpc','ctype','sector','mtr','sec1u','sec1d'],CTL_NUM=['t0','t1','v0','v1','qa','qb','per'];
+const CTL_TXT=['key','ckey','lkey','xp','mkey','c6','pf','fkey','cmeas','cbase','c2m','c2c','k2key','irkey','sekey','lrkey','mkkey','sakey','flkey','fltpl','cmpm','cmpb','cmpc','ctype','sector','mtr','sec1u','sec1d'],CTL_NUM=['t0','t1','v0','v1','qa','qb','per','n0','n1'];
 $('#main').addEventListener('change',e=>{const t=e.target,id=t.id;
   if(CTL_TXT.includes(id))S[id]=t.value;else if(CTL_NUM.includes(id))S[id]=+t.value;else if(id==='path')S.path=t.checked;
   else if(id==='bank'){S.bank=+t.value;S.ref=+t.value}else return;render()});
